@@ -5,6 +5,7 @@
   "main": "lib/Botkit.js",
   "dependencies": {
     "body-parser": "^1.13.3",
+    "exec": "^0.2.1",
     "express": "^4.13.3",
     "jfs": "^0.2.6",
     "mustache": "^2.1.3",
