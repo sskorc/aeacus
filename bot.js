@@ -5,9 +5,14 @@ var Botkit = require('./lib/Botkit.js'),
     port: 9988
   }),
   spawner = require('child_process').spawn;
-var damian;
+var damian = null;
 wss.on('connection', function(ws) {
   damian = ws;
+  console.log("new connection");
+  ws.on('close', function() {
+    damian = null;
+    console.log("Android device lost connection!");
+  });
 });
 
 var controller = Botkit.slackbot({
@@ -20,13 +25,28 @@ var bot = controller.spawn({
 
 var openDoors = function(reply) {
   click = spawner("/opt/click");
+  notifyWS('opened', reply);
   reply("The doors are opened!");
   click.on('close', function() {
-    reply("The door are closed!");
+    reply("The doors are closed!");
+    notifyWS('closed', reply);
   });
 };
-controller.hears(['hello', 'hi'],
-  'direct_message,direct_mention,mention',
+var notifyWS = function(msg, reply) {
+  if (damian !== null) {
+    try {
+      damian.send(msg);
+      console.log("Notified with " + msg);
+    } catch (e) {
+      reply("Error" + e);
+      console.log(e);
+    }
+  } else {
+    reply("Android device is off!");
+  }
+};
+
+controller.hears(['hello', 'hi'], 'direct_mention,mention',
   function(bot, message) {
     controller.storage.users.get(message.user, function(err, user) {
       if (user && user.name) {
@@ -37,15 +57,17 @@ controller.hears(['hello', 'hi'],
     });
   });
 
-controller.hears(['photo'], 'direct_message,direct_mention,mention', function(
+controller.hears(['photo'], 'direct_mention,mention', function(
   bot, message) {
-  if (damian !== null) {
-    damian.send('photo');
-  }
-});
-controller.hears(['open'], 'direct_message,direct_mention,mention', function(
-  bot, message) {
-  openDoors(function(msg) {
+  var reply = function(msg) {
     bot.reply(message, msg);
-  });
+  };
+  notifyWS('photo', reply);
+});
+controller.hears(['open'], 'direct_mention,mention', function(
+  bot, message) {
+  var reply = function(msg) {
+    bot.reply(message, msg);
+  };
+  openDoors(reply);
 });
