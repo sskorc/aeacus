@@ -61,13 +61,15 @@ controller.hears(['hello', 'hi'], 'direct_mention,mention',
     });
   });
 
-controller.hears(['photo'], 'direct_mention,mention', function(
+controller.hears(['photo', 'deny'], 'direct_mention,mention', function(
   bot, message) {
+  console.log(message.text);
   var reply = function(msg) {
     bot.reply(message, msg);
   };
   notifyWS('photo', reply);
 });
+
 controller.hears(['open'], 'direct_mention,mention', function(
   bot, message) {
   var reply = function(msg) {
