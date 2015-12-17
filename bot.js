@@ -19,7 +19,7 @@ var bot = controller.spawn({
 }).startRTM();
 
 var openDoors = function(bot) {
-  click = spawn("/opt/click");
+  click = spawner("/opt/click");
   click.on('close', function() {
     bot.reply("Opened!");
   });
