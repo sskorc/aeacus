@@ -18,10 +18,10 @@ var bot = controller.spawn({
   token: process.env.token
 }).startRTM();
 
-var openDoors = function(bot) {
+var openDoors = function(reply) {
   click = spawner("/opt/click");
   click.on('close', function() {
-    bot.reply("Opened!");
+    reply("Opened!");
   });
 };
 controller.hears(['hello', 'hi'],
@@ -44,5 +44,7 @@ controller.hears(['photo'], 'direct_message,direct_mention,mention', function(
 });
 controller.hears(['open'], 'direct_message,direct_mention,mention', function(
   bot, message) {
-  openDoors(bot);
+  openDoors(function(msg) {
+    bot.reply(message, msg);
+  });
 });
