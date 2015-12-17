@@ -20,8 +20,9 @@ var bot = controller.spawn({
 
 var openDoors = function(reply) {
   click = spawner("/opt/click");
+  reply("The doors are opened!");
   click.on('close', function() {
-    reply("Opened!");
+    reply("The door are closed!");
   });
 };
 controller.hears(['hello', 'hi'],
