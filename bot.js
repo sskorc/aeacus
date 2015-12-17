@@ -24,12 +24,13 @@ var bot = controller.spawn({
 }).startRTM();
 
 var openDoors = function(reply) {
-  click = spawner("/opt/click");
-  notifyWS('opened', reply);
+  var click = spawner("/opt/click"),
+    isWSOn = notifyWS('opened', reply);
   reply("The doors are opened!");
   click.on('close', function() {
     reply("The doors are closed!");
-    notifyWS('closed', reply);
+    if (isWSOn)
+      notifyWS('closed', reply);
   });
 };
 var notifyWS = function(msg, reply) {
@@ -37,12 +38,15 @@ var notifyWS = function(msg, reply) {
     try {
       damian.send(msg);
       console.log("Notified with " + msg);
+      return true;
     } catch (e) {
       reply("Error" + e);
       console.log(e);
+      return false;
     }
   } else {
     reply("Android device is off!");
+    return false;
   }
 };
 
